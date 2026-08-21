@@ -22,7 +22,7 @@ public class teleop extends LinearOpMode {
     private CRServo intakeservo; // the middle intake powered via servo
     private Servo servokicker; // the servo kicker
     private Servo gate;
-    private Servo hood;
+    //private Servo hood;
 
     @Override
     public void runOpMode() {
@@ -40,7 +40,7 @@ public class teleop extends LinearOpMode {
         //turretmtr = hardwareMap.get(DcMotor.class, "turretmtr");
         servokicker = hardwareMap.get(Servo.class, "servokicker");
         gate = hardwareMap.get(Servo.class, "gate");
-        hood = hardwareMap.get(Servo.class, "hood");
+        //hood = hardwareMap.get(Servo.class, "hood");
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeservo.setDirection(DcMotorSimple.Direction.REVERSE);

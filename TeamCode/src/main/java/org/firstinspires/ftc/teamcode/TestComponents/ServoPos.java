@@ -43,7 +43,7 @@ public class ServoPos extends LinearOpMode {
             telemetry.addLine("--------  GAMEPAD1 CONTROLS --------");
             telemetry.addLine("Dpad Up: +0.05  |  Dpad Down: -0.05");
             telemetry.addLine();
-            telemetry.addData("Servo Name", "servokicker");
+            telemetry.addData("Servo Name", "gate");
             telemetry.addData("Servo Position", "%.3f", servopos);
             telemetry.addData("Loop Time (ms)", "%.1f", getRuntime() * 1000 % 1000);
             telemetry.update();
