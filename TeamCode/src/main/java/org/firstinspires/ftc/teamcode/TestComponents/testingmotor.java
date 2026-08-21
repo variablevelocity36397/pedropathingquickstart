@@ -5,9 +5,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp(name = "testmotor", group = "Linear OpMode")
+@TeleOp(name = "testingmotor", group = "Linear OpMode")
 
-public class testmotor extends LinearOpMode {
+public class testingmotor extends LinearOpMode {
 
     private DcMotor intakemotor;   // intake motor
     private DcMotor frwheel; // front right wheel
