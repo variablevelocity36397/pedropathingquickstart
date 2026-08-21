@@ -28,16 +28,18 @@ public class teststuff extends LinearOpMode {
         intakeservo = hardwareMap.get(CRServo.class, "intakeservo");
         frwheel = hardwareMap.get(DcMotor.class, "frwheel");
         flwheel = hardwareMap.get(DcMotor.class, "flwheel");
+        flwheel.setDirection(DcMotorSimple.Direction.REVERSE);
         brwheel = hardwareMap.get(DcMotor.class, "brwheel");
         blwheel = hardwareMap.get(DcMotor.class, "blwheel");
+        blwheel.setDirection(DcMotorSimple.Direction.REVERSE);
         shooter1 = hardwareMap.get(DcMotor.class, "shooter1");
         shooter2 = hardwareMap.get(DcMotor.class, "shooter2");
         //turretmtr = hardwareMap.get(DcMotor.class, "turretmtr");
         servokicker = hardwareMap.get(Servo.class, "servokicker");
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeservo.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        // Reverse the motors above this line. Follow directions from the comments past the line of code.
 
         shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); // Dont touch
         shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); // Dont touch
