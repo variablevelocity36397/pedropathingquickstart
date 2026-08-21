@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name = "teststuff", group = "Linear OpMode")
 
@@ -20,6 +21,8 @@ public class teststuff extends LinearOpMode {
     //private DcMotor turretmtr; // the motor that turns the turntable/turret
     private CRServo intakeservo; // the middle intake powered via servo
     private Servo servokicker; // the servo kicker
+    private Servo gate;
+    private Servo hood;
 
     @Override
     public void runOpMode() {
@@ -36,6 +39,8 @@ public class teststuff extends LinearOpMode {
         shooter2 = hardwareMap.get(DcMotor.class, "shooter2");
         //turretmtr = hardwareMap.get(DcMotor.class, "turretmtr");
         servokicker = hardwareMap.get(Servo.class, "servokicker");
+        gate = hardwareMap.get(Servo.class, "gate");
+        hood = hardwareMap.get(Servo.class, "hood");
         shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
         shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeservo.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -46,18 +51,35 @@ public class teststuff extends LinearOpMode {
 
         telemetry.addLine("--------  GAMEPAD CONTROLS --------");
         telemetry.addLine("Press A to toggle intake");
-        telemetry.addLine("Press B to toggle the servo kicker");
+        telemetry.addLine("Press Dpad Left to intake opposite direction");
+        telemetry.addLine("Press B to kick (auto-returns after 0.75s)");
         telemetry.addLine("Press X to toggle both flywheel motors");
+        telemetry.addLine("Press Y to toggle shooter power (1.0 / 0.7)");
+        telemetry.addLine("Press Dpad Up to toggle the gate open/closed");
         telemetry.addLine("Left joystick to move, Right joystick to turn");
         telemetry.addLine("Hold the Right Trigger to drive at 20% speed");
 
 
         telemetry.update();
-        waitForStart();
 
         boolean flag = true;
         boolean flag2 = true;
         boolean flag3 = true;
+        boolean flag4 = true;
+        boolean flag5 = true;
+        boolean reverseFlag = true;
+        final double servokickerrest = 0.05;
+        final double servokickerkick = 0.456;
+        final double gateopen = 0.5;
+        final double gateclose = 0.1;
+        double shooterpower = 1;
+        ElapsedTime kickTimer = new ElapsedTime();
+        boolean isKicking = false;
+
+
+        gate.setPosition(gateclose);
+        waitForStart();
+
 
         while (opModeIsActive()) {
 
@@ -89,19 +111,44 @@ public class teststuff extends LinearOpMode {
                 }
                 flag = !flag;
             }
-            if (gamepad1.bWasPressed()) { // click the button b to toggle the servo kicker
-                if (flag2) {
-                    servokicker.setPosition(0.05);
+            if (gamepad1.dpadLeftWasPressed()) { // toggles intake opposite direction
+                if (reverseFlag) {
+                    intakemotor.setPower(-1);
+                    intakeservo.setPower(-1);
+                } else {
+                    intakemotor.setPower(1);
+                    intakeservo.setPower(1);
+                    flag = false;
                 }
-                else {
-                    servokicker.setPosition(0.456);
+                reverseFlag = !reverseFlag;
+            }
+            if (gamepad1.bWasPressed() && !isKicking) { // press B to kick
+                servokicker.setPosition(servokickerkick);
+                kickTimer.reset();
+                isKicking = true;
+            }
+
+            if (isKicking && kickTimer.seconds() >= 0.75) { // auto-return after 0.75s
+                servokicker.setPosition(servokickerrest);
+                isKicking = false;
+            }
+
+            if (gamepad1.yWasPressed()) { // click y to toggle shooter power level
+                if (flag4) {
+                    shooterpower = 1.0;
+                } else {
+                    shooterpower = 0.7;
                 }
-                flag2 = !flag2;
+                flag4 = !flag4;
+                if (flag3) { // if shooter is running and power is changed, power is immediately updated
+                    shooter1.setPower(shooterpower);
+                    shooter2.setPower(shooterpower);
+                }
             }
             if (gamepad1.xWasPressed()) { // click the button x to toggle the shooter
                 if (flag3) {
-                    shooter1.setPower(0.5);
-                    shooter2.setPower(0.5);
+                    shooter1.setPower(shooterpower);
+                    shooter2.setPower(shooterpower);
                 }
                 else {
                     shooter2.setPower(0);
@@ -109,6 +156,16 @@ public class teststuff extends LinearOpMode {
                 }
                 flag3 = !flag3;
             }
+            if (gamepad1.dpadUpWasPressed()) { // click dpad up to switch between states gate open and close
+                if (flag5) {
+                    gate.setPosition(gateopen);
+                }
+                else {
+                    gate.setPosition(gateclose);
+                }
+                flag5 = !flag5;
+            }
+
         }
     }
 }
