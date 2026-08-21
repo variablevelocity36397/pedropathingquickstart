@@ -68,8 +68,8 @@ public class teststuff extends LinearOpMode {
         boolean flag4 = true;
         boolean flag5 = true;
         boolean reverseFlag = true;
-        final double servokickerrest = 0.05;
-        final double servokickerkick = 0.456;
+        final double servokickerkick = 0.05;
+        final double servokickerrest = 0.456;
         final double gateopen = 0.5;
         final double gateclose = 0.1;
         double shooterpower = 1;
