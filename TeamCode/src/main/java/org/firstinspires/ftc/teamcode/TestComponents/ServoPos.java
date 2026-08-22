@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class ServoPos extends LinearOpMode {
 
     private Servo gate;
+    double newPos = 0.5;
 
     @Override
     public void runOpMode() {
@@ -22,18 +23,18 @@ public class ServoPos extends LinearOpMode {
         telemetry.addLine("Initialized. Press PLAY to start.");
         telemetry.update();
 
+        gate.setPosition(newPos);
+
         waitForStart();
 
         while (opModeIsActive()) {
 
-            // Optional: let dpad up/down nudge the servo so you can watch it move
+            gate.setPosition(newPos);
             if (gamepad1.dpadUpWasPressed()) {
-                double newPos = Math.min(1.0, gate.getPosition() + 0.05);
-                gate.setPosition(newPos);
+                newPos = newPos + 0.05;
             }
             if (gamepad1.dpadDownWasPressed()) {
-                double newPos = Math.max(0.0, gate.getPosition() - 0.05);
-                gate.setPosition(newPos);
+                newPos = newPos - 0.05;
             }
 
             // Read current position every loop
@@ -46,6 +47,7 @@ public class ServoPos extends LinearOpMode {
             telemetry.addData("Servo Name", "gate");
             telemetry.addData("Servo Position", "%.3f", servopos);
             telemetry.addData("Loop Time (ms)", "%.1f", getRuntime() * 1000 % 1000);
+            telemetry.addData("Servo Position: ", newPos);
             telemetry.update();
         }
     }
