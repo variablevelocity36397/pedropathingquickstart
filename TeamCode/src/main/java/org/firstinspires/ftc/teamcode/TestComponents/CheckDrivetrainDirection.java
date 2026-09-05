@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.TestComponents;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name = "CheckDrivetrainDirection", group = "Testing")
 public class CheckDrivetrainDirection extends LinearOpMode {
@@ -23,6 +24,10 @@ public class CheckDrivetrainDirection extends LinearOpMode {
         flwheel = hardwareMap.get(DcMotor.class, "flwheel");
         brwheel = hardwareMap.get(DcMotor.class, "brwheel");
         blwheel = hardwareMap.get(DcMotor.class, "blwheel");
+        frwheel.setDirection(DcMotorSimple.Direction.FORWARD);
+        flwheel.setDirection(DcMotorSimple.Direction.REVERSE);
+        brwheel.setDirection(DcMotorSimple.Direction.FORWARD);
+        blwheel.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // Make sure motors stop when not pressed
         frwheel.setPower(0);

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TestComponents;
+package org.firstinspires.ftc.teamcode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "teststuff", group = "Testing")
+@TeleOp(name = "TeleOp", group = "TeleOp")
 
-public class teststuff extends LinearOpMode {
+public class Teleop extends LinearOpMode {
 
     private DcMotor intakemotor;   // intake motor
     private DcMotor frwheel; // front right wheel
@@ -122,7 +122,7 @@ public class teststuff extends LinearOpMode {
                 }
                 reverseFlag = !reverseFlag;
             }
-            if (gamepad1.bWasPressed() && !isKicking) { // press B to kick
+            /*if (gamepad1.bWasPressed() && !isKicking) { // press B to kick
                 servokicker.setPosition(servokickerkick);
                 kickTimer.reset();
                 isKicking = true;
@@ -131,6 +131,14 @@ public class teststuff extends LinearOpMode {
             if (isKicking && kickTimer.seconds() >= 0.75) { // auto-return after 0.75s
                 servokicker.setPosition(servokickerrest);
                 isKicking = false;
+            }*/
+            if (gamepad1.bWasPressed()) {
+                kickTimer.reset();
+                servokicker.setPosition(servokickerkick);
+                kickTimer.reset();
+            }
+            if (kickTimer.seconds() >= 0.75) {
+                servokicker.setPosition(servokickerrest);
             }
 
             if (gamepad1.yWasPressed()) { // click y to toggle shooter power level

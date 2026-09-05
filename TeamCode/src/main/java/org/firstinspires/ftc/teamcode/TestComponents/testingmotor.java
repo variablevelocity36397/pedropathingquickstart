@@ -33,9 +33,11 @@ public class testingmotor extends LinearOpMode {
         leftshooter = hardwareMap.get(DcMotor.class, "leftshooter");
         leftshooter.setDirection(DcMotorSimple.Direction.FORWARD);
         rightshooter = hardwareMap.get(DcMotor.class, "rightshooter");
-        rightshooter.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightshooter.setDirection(DcMotorSimple.Direction.FORWARD);
         //turretmtr = hardwareMap.get(DcMotor.class, "turretmtr");
         servokicker = hardwareMap.get(Servo.class, "servokicker");
+        flwheel.setDirection(DcMotorSimple.Direction.REVERSE);
+        blwheel.setDirection(DcMotorSimple.Direction.REVERSE);
 
         servokicker.setPosition(0.456);
 
