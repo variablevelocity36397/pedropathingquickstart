@@ -83,21 +83,21 @@ public class BlueCloseGoal extends LinearOpMode {
 
     public Command autoRoutine() {
         return sequential(
-                /* Go To Score Command*/
+                // score preload
                 follow(follower, scorePreload),
-                /* Collect 3 Artifacts Command*/
+                // first 3 balls intake
                 follow(follower, grabPickup1, true),
-                /* Go Back To Score Command*/
+                // fire first 3 balls
                 follow(follower, scorePickup1, true),
-                /* Collect 3 Artifacts Command*/
+                // 2nd 3 balls intake
                 follow(follower, grabPickup2, true),
-                /* Go Back To Score Command*/
+                // fire 2nd 3 balls
                 follow(follower, scorePickup2, true),
-                /* Collect 3 Artifacts Command*/
+                // 3rd 3 balls intake
                 follow(follower, grabPickup3, true),
-                /* Go Back To Score Command*/
+                // fire 3rd 3 balls
                 follow(follower, scorePickup3, true),
-                /* Leave Start Line Command*/
+                // leave score zone
                 follow(follower, leave, true)
         );
     }

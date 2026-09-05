@@ -1,11 +1,12 @@
 package org.firstinspires.ftc.teamcode.TestComponents;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp(name = "testingmotor", group = "Linear OpMode")
+@TeleOp(name = "testingmotor", group = "Testing")
 
 public class testingmotor extends LinearOpMode {
 
@@ -14,8 +15,8 @@ public class testingmotor extends LinearOpMode {
     private DcMotor flwheel; // front left wheel
     private DcMotor brwheel; // back right wheel
     private DcMotor blwheel; // back left wheel
-    //private DcMotor shooter1; // one of the 2 shooter motors
-    //private DcMotor shooter2; // the second of the 2 shooter motors
+    private DcMotor leftshooter; // one of the 2 shooter motors
+    private DcMotor rightshooter; // the second of the 2 shooter motors
     //private DcMotor turretmtr; // the motor that turns the turntable/turret
     private CRServo intakeservo; // the middle intake powered via servo
     private Servo servokicker; //servo kicker
@@ -29,8 +30,10 @@ public class testingmotor extends LinearOpMode {
         flwheel = hardwareMap.get(DcMotor.class, "flwheel");
         brwheel = hardwareMap.get(DcMotor.class, "brwheel");
         blwheel = hardwareMap.get(DcMotor.class, "blwheel");
-        //shooter1 = hardwareMap.get(DcMotor.class, "shooter1");
-        //shooter2 = hardwareMap.get(DcMotor.class, "shooter2");
+        leftshooter = hardwareMap.get(DcMotor.class, "leftshooter");
+        leftshooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightshooter = hardwareMap.get(DcMotor.class, "rightshooter");
+        rightshooter.setDirection(DcMotorSimple.Direction.REVERSE);
         //turretmtr = hardwareMap.get(DcMotor.class, "turretmtr");
         servokicker = hardwareMap.get(Servo.class, "servokicker");
 
@@ -43,6 +46,18 @@ public class testingmotor extends LinearOpMode {
 
         while (opModeIsActive()) {
 
+            if (gamepad1.left_trigger > 0.1) {
+                leftshooter.setPower(0.3);
+            } else {
+                leftshooter.setPower(0);
+            }
+
+            if (gamepad1.right_trigger > 0.1) {
+                rightshooter.setPower(0.3);
+            } else {
+                rightshooter.setPower(0);
+            }
+/*
             double y = gamepad1.left_stick_y ;       // left joystick control forward/back movement
             double x = -gamepad1.left_stick_x ;     // right joystick control right/left turning
             double rx = -gamepad1.right_stick_x * 0.8;
@@ -80,7 +95,7 @@ public class testingmotor extends LinearOpMode {
                 }
                 flag2 = !flag2;
             }
-
+            */
 
 
         }

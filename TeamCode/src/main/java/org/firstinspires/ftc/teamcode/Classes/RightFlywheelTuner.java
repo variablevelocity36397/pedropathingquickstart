@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-@TeleOp
+@TeleOp(name = "RightFlywheelTuner", group = "Tuning")
 public class RightFlywheelTuner extends OpMode {
 
     public DcMotorEx rightshooter;
@@ -23,7 +23,7 @@ public class RightFlywheelTuner extends OpMode {
     @Override
     public void init() {
         rightshooter = hardwareMap.get(DcMotorEx.class, "rightshooter");
-        rightshooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightshooter.setDirection(DcMotorSimple.Direction.REVERSE);
         rightshooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         PIDFCoefficients pidfCoefficients = new PIDFCoefficients(P, 0, 0, F);

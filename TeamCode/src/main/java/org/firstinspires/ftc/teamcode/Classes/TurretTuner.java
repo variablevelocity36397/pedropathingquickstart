@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 import java.util.List;
 
-@TeleOp
+@TeleOp(name = "TurretTuner", group = "Tuning")
 public class TurretTuner extends OpMode {
 
     private DcMotorEx turretMotor;

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "teststuff", group = "Linear OpMode")
+@TeleOp(name = "teststuff", group = "Testing")
 
 public class teststuff extends LinearOpMode {
 
@@ -16,8 +16,8 @@ public class teststuff extends LinearOpMode {
     private DcMotor flwheel; // front left wheel
     private DcMotor brwheel; // back right wheel
     private DcMotor blwheel; // back left wheel
-    private DcMotor shooter1; // one of the 2 shooter motors
-    private DcMotor shooter2; // the second of the 2 shooter motors
+    private DcMotor leftshooter; // one of the 2 shooter motors
+    private DcMotor rightshooter; // the second of the 2 shooter motors
     //private DcMotor turretmtr; // the motor that turns the turntable/turret
     private CRServo intakeservo; // the middle intake powered via servo
     private Servo servokicker; // the servo kicker
@@ -35,19 +35,19 @@ public class teststuff extends LinearOpMode {
         brwheel = hardwareMap.get(DcMotor.class, "brwheel");
         blwheel = hardwareMap.get(DcMotor.class, "blwheel");
         blwheel.setDirection(DcMotorSimple.Direction.REVERSE);
-        shooter1 = hardwareMap.get(DcMotor.class, "shooter1");
-        shooter2 = hardwareMap.get(DcMotor.class, "shooter2");
+        leftshooter = hardwareMap.get(DcMotor.class, "leftshooter");
+        rightshooter = hardwareMap.get(DcMotor.class, "rightshooter");
         //turretmtr = hardwareMap.get(DcMotor.class, "turretmtr");
         servokicker = hardwareMap.get(Servo.class, "servokicker");
         gate = hardwareMap.get(Servo.class, "gate");
         //hood = hardwareMap.get(Servo.class, "hood");
-        shooter1.setDirection(DcMotorSimple.Direction.FORWARD);
-        shooter2.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftshooter.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightshooter.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeservo.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
-        shooter2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); // Dont touch
-        shooter1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); // Dont touch
+        rightshooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); // Dont touch
+        leftshooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); // Dont touch
 
         telemetry.addLine("--------  GAMEPAD CONTROLS --------");
         telemetry.addLine("Press A to toggle intake");
@@ -141,18 +141,18 @@ public class teststuff extends LinearOpMode {
                 }
                 flag4 = !flag4;
                 if (flag3) { // if shooter is running and power is changed, power is immediately updated
-                    shooter1.setPower(shooterpower);
-                    shooter2.setPower(shooterpower);
+                    leftshooter.setPower(shooterpower);
+                    rightshooter.setPower(shooterpower);
                 }
             }
             if (gamepad1.xWasPressed()) { // click the button x to toggle the shooter
                 if (flag3) {
-                    shooter1.setPower(shooterpower);
-                    shooter2.setPower(shooterpower);
+                    leftshooter.setPower(shooterpower);
+                    rightshooter.setPower(shooterpower);
                 }
                 else {
-                    shooter2.setPower(0);
-                    shooter1.setPower(0);
+                    rightshooter.setPower(0);
+                    leftshooter.setPower(0);
                 }
                 flag3 = !flag3;
             }

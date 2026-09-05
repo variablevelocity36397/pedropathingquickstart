@@ -22,11 +22,11 @@ public class Flywheel {
     private boolean isSpinning = false;
 
     public Flywheel(HardwareMap hardwareMap) {
-        leftMotor = hardwareMap.get(DcMotorEx.class, "shooter1");
-        rightMotor = hardwareMap.get(DcMotorEx.class, "shooter2");
+        leftMotor = hardwareMap.get(DcMotorEx.class, "leftshooter");
+        rightMotor = hardwareMap.get(DcMotorEx.class, "rightshooter");
 
         leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightMotor.setDirection(DcMotorSimple.Direction.FORWARD); // same direction -- shared shaft
+        rightMotor.setDirection(DcMotorSimple.Direction.REVERSE); // same direction -- shared shaft
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);

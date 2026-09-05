@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
-@TeleOp
+@TeleOp(name = "LeftFlywheelTuner", group = "Tuning")
 public class LeftFlywheelTuner extends OpMode {
 
    public DcMotorEx leftshooter;

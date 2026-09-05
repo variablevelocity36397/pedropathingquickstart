@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp(name = "CheckDrivetrainDirection")
+@TeleOp(name = "CheckDrivetrainDirection", group = "Testing")
 public class CheckDrivetrainDirection extends LinearOpMode {
 
     private DcMotor frwheel;
