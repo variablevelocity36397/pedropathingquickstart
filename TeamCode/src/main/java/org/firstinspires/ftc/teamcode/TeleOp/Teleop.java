@@ -27,7 +27,6 @@ public class Teleop extends LinearOpMode {
     final double ticks_degree = (8192.0 * 8.0) / 360;
     final double min_degree = -160;
     final double max_degree = 160;
-    double turretpower = 0.7;
 
     public double getCurrentDeg() {
         return turretmtr.getCurrentPosition() / ticks_degree;
@@ -78,7 +77,6 @@ public class Teleop extends LinearOpMode {
         telemetry.update();
 
         boolean flag = true;
-        boolean flag2 = true;
         boolean flag3 = true;
         boolean flag4 = true;
         boolean flag5 = true;
@@ -87,11 +85,11 @@ public class Teleop extends LinearOpMode {
         final double servokickerrest = 0.456;
         final double gateopen = 0.5;
         final double gateclose = 0.1;
-        double shooterpower = 1;
+        double shooterpower = 0.4;
         ElapsedTime kickTimer = new ElapsedTime();
-        boolean isKicking = false;
-
-        double slowdown_zone = 12;
+        double slowdown_zone = 19;
+        double currentTurretPower = 0; // still needs to persist outside the loop
+        double stopRampRate = 0.07;    // how slowly it decays to 0 on release — tune this
 
 
 
@@ -153,9 +151,9 @@ public class Teleop extends LinearOpMode {
 
             if (gamepad1.yWasPressed()) { // click y to toggle shooter power level
                 if (flag4) {
-                    shooterpower = 1.0;
-                } else {
                     shooterpower = 0.7;
+                } else {
+                    shooterpower = 0.4;
                 }
                 flag4 = !flag4;
                 if (flag3) { // if shooter is running and power is changed, power is immediately updated
@@ -186,31 +184,42 @@ public class Teleop extends LinearOpMode {
 
 
             double currentDeg = getCurrentDeg();
-            turretpower = 0;
+            double targetPower = 0;
 
             if (gamepad1.dpad_left) {
-                turretpower = 0.7;
+                targetPower = 0.7;
             }
             if (gamepad1.dpad_right) {
-                turretpower = -0.7;
+                targetPower = -0.7;
             }
 
             double distToMax = max_degree - currentDeg;
             double distToMin = currentDeg - min_degree;
 
-            if (turretpower > 0 && distToMax < slowdown_zone) {
+            if (targetPower > 0 && distToMax < slowdown_zone) {
                 double scale = distToMax / slowdown_zone;
                 scale = Math.max(scale, 0);
-                turretpower *= scale;
+                targetPower *= scale;
             }
 
-            if (turretpower < 0 && distToMin < slowdown_zone) {
+            if (targetPower < 0 && distToMin < slowdown_zone) {
                 double scale = distToMin / slowdown_zone;
                 scale = Math.max(scale, 0);
-                turretpower *= scale;
+                targetPower *= scale;
             }
 
-            turretmtr.setPower(turretpower);
+            if (targetPower == 0) {
+                // button released to ramp power down slowly
+                if (currentTurretPower > 0) {
+                    currentTurretPower = Math.max(currentTurretPower - stopRampRate, 0);
+                } else if (currentTurretPower < 0) {
+                    currentTurretPower = Math.min(currentTurretPower + stopRampRate, 0);
+                }
+            } else {
+                currentTurretPower = targetPower;
+            }
+
+            turretmtr.setPower(currentTurretPower);
         }
     }
 }
