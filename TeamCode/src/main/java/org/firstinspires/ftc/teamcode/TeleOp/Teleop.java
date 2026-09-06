@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -18,10 +19,19 @@ public class Teleop extends LinearOpMode {
     private DcMotor blwheel; // back left wheel
     private DcMotor leftshooter; // one of the 2 shooter motors
     private DcMotor rightshooter; // the second of the 2 shooter motors
-    //private DcMotor turretmtr; // the motor that turns the turntable/turret
+    private DcMotorEx turretmtr; // the motor that turns the turntable/turret
     private CRServo intakeservo; // the middle intake powered via servo
     private Servo servokicker; // the servo kicker
     private Servo gate;
+
+    final double ticks_degree = (8192.0 * 8.0) / 360;
+    final double min_degree = -160;
+    final double max_degree = 160;
+    double turretpower = 0.7;
+
+    public double getCurrentDeg() {
+        return turretmtr.getCurrentPosition() / ticks_degree;
+    }
     //private Servo hood;
 
     @Override
@@ -37,13 +47,17 @@ public class Teleop extends LinearOpMode {
         blwheel.setDirection(DcMotorSimple.Direction.REVERSE);
         leftshooter = hardwareMap.get(DcMotor.class, "leftshooter");
         rightshooter = hardwareMap.get(DcMotor.class, "rightshooter");
-        //turretmtr = hardwareMap.get(DcMotor.class, "turretmtr");
+        turretmtr = hardwareMap.get(DcMotorEx.class, "turretmtr");
         servokicker = hardwareMap.get(Servo.class, "servokicker");
         gate = hardwareMap.get(Servo.class, "gate");
         //hood = hardwareMap.get(Servo.class, "hood");
         leftshooter.setDirection(DcMotorSimple.Direction.FORWARD);
         rightshooter.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeservo.setDirection(DcMotorSimple.Direction.REVERSE);
+        turretmtr.setDirection(DcMotorSimple.Direction.FORWARD);
+        turretmtr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        turretmtr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        turretmtr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
         rightshooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); // Dont touch
@@ -51,13 +65,14 @@ public class Teleop extends LinearOpMode {
 
         telemetry.addLine("--------  GAMEPAD CONTROLS --------");
         telemetry.addLine("Press A to toggle intake");
-        telemetry.addLine("Press Dpad Left to intake opposite direction");
         telemetry.addLine("Press B to kick (auto-returns after 0.75s)");
         telemetry.addLine("Press X to toggle both flywheel motors");
         telemetry.addLine("Press Y to toggle shooter power (1.0 / 0.7)");
         telemetry.addLine("Press Dpad Up to toggle the gate open/closed");
+        telemetry.addLine("Press Dpad Down to intake opposite direction");
         telemetry.addLine("Left joystick to move, Right joystick to turn");
         telemetry.addLine("Hold the Right Trigger to drive at 20% speed");
+        telemetry.addLine("Dpad Left and Right to manually move turret");
 
 
         telemetry.update();
@@ -75,6 +90,11 @@ public class Teleop extends LinearOpMode {
         double shooterpower = 1;
         ElapsedTime kickTimer = new ElapsedTime();
         boolean isKicking = false;
+
+        double slowdown_zone = 12;
+
+
+
 
 
         gate.setPosition(gateclose);
@@ -111,7 +131,7 @@ public class Teleop extends LinearOpMode {
                 }
                 flag = !flag;
             }
-            if (gamepad1.dpadLeftWasPressed()) { // toggles intake opposite direction
+            if (gamepad1.dpadDownWasPressed()) { // toggles intake opposite direction
                 if (reverseFlag) {
                     intakemotor.setPower(-1);
                     intakeservo.setPower(-1);
@@ -122,16 +142,6 @@ public class Teleop extends LinearOpMode {
                 }
                 reverseFlag = !reverseFlag;
             }
-            /*if (gamepad1.bWasPressed() && !isKicking) { // press B to kick
-                servokicker.setPosition(servokickerkick);
-                kickTimer.reset();
-                isKicking = true;
-            }
-
-            if (isKicking && kickTimer.seconds() >= 0.75) { // auto-return after 0.75s
-                servokicker.setPosition(servokickerrest);
-                isKicking = false;
-            }*/
             if (gamepad1.bWasPressed()) {
                 kickTimer.reset();
                 servokicker.setPosition(servokickerkick);
@@ -174,6 +184,33 @@ public class Teleop extends LinearOpMode {
                 flag5 = !flag5;
             }
 
+
+            double currentDeg = getCurrentDeg();
+            turretpower = 0;
+
+            if (gamepad1.dpad_left) {
+                turretpower = 0.7;
+            }
+            if (gamepad1.dpad_right) {
+                turretpower = -0.7;
+            }
+
+            double distToMax = max_degree - currentDeg;
+            double distToMin = currentDeg - min_degree;
+
+            if (turretpower > 0 && distToMax < slowdown_zone) {
+                double scale = distToMax / slowdown_zone;
+                scale = Math.max(scale, 0);
+                turretpower *= scale;
+            }
+
+            if (turretpower < 0 && distToMin < slowdown_zone) {
+                double scale = distToMin / slowdown_zone;
+                scale = Math.max(scale, 0);
+                turretpower *= scale;
+            }
+
+            turretmtr.setPower(turretpower);
         }
     }
 }
