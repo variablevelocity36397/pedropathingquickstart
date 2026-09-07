@@ -17,16 +17,16 @@ public class Teleop extends LinearOpMode {
     private DcMotor flwheel; // front left wheel
     private DcMotor brwheel; // back right wheel
     private DcMotor blwheel; // back left wheel
-    private DcMotor leftshooter; // one of the 2 shooter motors
-    private DcMotor rightshooter; // the second of the 2 shooter motors
+    private DcMotorEx leftshooter; // one of the 2 shooter motors
+    private DcMotorEx rightshooter; // the second of the 2 shooter motors
     private DcMotorEx turretmtr; // the motor that turns the turntable/turret
     private CRServo intakeservo; // the middle intake powered via servo
     private Servo servokicker; // the servo kicker
     private Servo gate;
 
     final double ticks_degree = (8192.0 * 8.0) / 360;
-    final double min_degree = -160;
-    final double max_degree = 160;
+    final double min_degree = -210;
+    final double max_degree = 150;
 
     public double getCurrentDeg() {
         return turretmtr.getCurrentPosition() / ticks_degree;
@@ -44,8 +44,8 @@ public class Teleop extends LinearOpMode {
         brwheel = hardwareMap.get(DcMotor.class, "brwheel");
         blwheel = hardwareMap.get(DcMotor.class, "blwheel");
         blwheel.setDirection(DcMotorSimple.Direction.REVERSE);
-        leftshooter = hardwareMap.get(DcMotor.class, "leftshooter");
-        rightshooter = hardwareMap.get(DcMotor.class, "rightshooter");
+        leftshooter = hardwareMap.get(DcMotorEx.class, "leftshooter");
+        rightshooter = hardwareMap.get(DcMotorEx.class, "rightshooter");
         turretmtr = hardwareMap.get(DcMotorEx.class, "turretmtr");
         servokicker = hardwareMap.get(Servo.class, "servokicker");
         gate = hardwareMap.get(Servo.class, "gate");
@@ -71,31 +71,34 @@ public class Teleop extends LinearOpMode {
         telemetry.addLine("Press Dpad Down to intake opposite direction");
         telemetry.addLine("Left joystick to move, Right joystick to turn");
         telemetry.addLine("Hold the Right Trigger to drive at 20% speed");
-        telemetry.addLine("Dpad Left and Right to manually move turret");
+        telemetry.addLine("Left and Right Bumper to manually move turret");
+
 
 
         telemetry.update();
 
         boolean flag = true;
-        boolean flag3 = true;
+        boolean flag3 = false;
         boolean flag4 = true;
         boolean flag5 = true;
         boolean reverseFlag = true;
         final double servokickerkick = 0.05;
         final double servokickerrest = 0.456;
         final double gateopen = 0.5;
-        final double gateclose = 0.1;
-        double shooterpower = 0.4;
+        final double gateclose = 0.25;
+        double shootervel = 750;
         ElapsedTime kickTimer = new ElapsedTime();
-        double slowdown_zone = 19;
+        double slowdown_zone = 12;
         double currentTurretPower = 0; // still needs to persist outside the loop
-        double stopRampRate = 0.07;    // how slowly it decays to 0 on release — tune this
+        double stopRampRate = 0.35;    // how slowly it decays to 0 on release — tune this
 
 
 
 
 
         gate.setPosition(gateclose);
+
+
         waitForStart();
 
 
@@ -151,20 +154,20 @@ public class Teleop extends LinearOpMode {
 
             if (gamepad1.yWasPressed()) { // click y to toggle shooter power level
                 if (flag4) {
-                    shooterpower = 0.7;
+                    shootervel = 1200;
                 } else {
-                    shooterpower = 0.4;
+                    shootervel = 750;
                 }
                 flag4 = !flag4;
                 if (flag3) { // if shooter is running and power is changed, power is immediately updated
-                    leftshooter.setPower(shooterpower);
-                    rightshooter.setPower(shooterpower);
+                    leftshooter.setVelocity(shootervel);
+                    rightshooter.setVelocity(shootervel);
                 }
             }
             if (gamepad1.xWasPressed()) { // click the button x to toggle the shooter
-                if (flag3) {
-                    leftshooter.setPower(shooterpower);
-                    rightshooter.setPower(shooterpower);
+                if (!flag3) {
+                    leftshooter.setVelocity(shootervel);
+                    rightshooter.setVelocity(shootervel);
                 }
                 else {
                     rightshooter.setPower(0);
@@ -186,11 +189,11 @@ public class Teleop extends LinearOpMode {
             double currentDeg = getCurrentDeg();
             double targetPower = 0;
 
-            if (gamepad1.dpad_left) {
-                targetPower = 0.7;
+            if (gamepad1.left_bumper) {
+                targetPower = 0.4;
             }
-            if (gamepad1.dpad_right) {
-                targetPower = -0.7;
+            if (gamepad1.right_bumper) {
+                targetPower = -0.4;
             }
 
             double distToMax = max_degree - currentDeg;
@@ -220,6 +223,21 @@ public class Teleop extends LinearOpMode {
             }
 
             turretmtr.setPower(currentTurretPower);
+
+
+            telemetry.addLine("--------  GAMEPAD CONTROLS --------");
+            telemetry.addLine("Press A to toggle intake");
+            telemetry.addLine("Press B to kick (auto-returns after 0.75s)");
+            telemetry.addLine("Press X to toggle both flywheel motors");
+            telemetry.addLine("Press Y to toggle shooter power (1.0 / 0.7)");
+            telemetry.addLine("Press Dpad Up to toggle the gate open/closed");
+            telemetry.addLine("Press Dpad Down to intake opposite direction");
+            telemetry.addLine("Left joystick to move, Right joystick to turn");
+            telemetry.addLine("Hold the Right Trigger to drive at 20% speed");
+            telemetry.addLine("Left and Right Bumper to manually move turret");
+            telemetry.addData("Current Position: ", getCurrentDeg());
+            telemetry.addData("Shooter power: ", shootervel);
+            telemetry.update();
         }
     }
 }
