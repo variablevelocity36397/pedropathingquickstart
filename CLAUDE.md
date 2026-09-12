@@ -24,16 +24,32 @@ There is no meaningful unit/instrumented test suite in this repo (no `src/test` 
 
 ## Architecture
 
-### TeamCode / pedroPathing package
+### TeamCode / pedro package
 
-All current team code lives in `TeamCode/src/main/java/org/firstinspires/ftc/teamcode/pedroPathing/`:
+All current team code lives in `TeamCode/src/main/java/org/firstinspires/ftc/teamcode/pedro/`
+(PedroPathing 3.0+; this was `pedroPathing` before the 3.0 migration):
 
-- **`Constants.java`** — the single source of truth for robot tuning constants. `followerConstants` (a `FollowerConstants`) and `pathConstraints` (a `PathConstraints`) are configured here, and `createFollower(hardwareMap)` builds a `Follower` via `FollowerBuilder`. Any OpMode that wants to drive the robot via PedroPathing calls `Constants.createFollower(...)` to get a configured `Follower`. When tuning a new robot, this is the file that gets edited with the values produced by the tuners below.
+- **`Constants.java`** — the single source of truth for robot tuning constants: a `MecanumConfig`
+  (`drivetrainConfig`), a `PinpointConfig` (`localizerConfig`), and a `ForesightConfig`
+  (`foresightConfig`), each built via a lambda-based config builder. `create(hardwareMap)` builds a
+  `Follower` directly from `new Follower(new PinpointLocalizer(...), new Mecanum(...), new Foresight(...))`.
+  Any OpMode that wants to drive the robot via PedroPathing calls `Constants.create(...)` to get a
+  configured `Follower`. When tuning a new robot, this is the file that gets edited with the values
+  produced by AutoTune (see below).
 
-- **`Tuning.java`** — a single large file containing a `SelectableOpMode` (`Tuning`, `@TeleOp` group "Pedro Pathing") plus ~20 package-private `OpMode` classes, one per tuning routine, all nested in the same file. The `Tuning` class builds a menu (via `SelectableOpMode`'s `s.folder(...)`/`.add(name, Ctor::new)` DSL) organized into folders: **Localization**, **Automatic**, **Manual**, **Tests**, **Swerve**. Each menu entry maps to one of the OpMode classes defined later in the file (e.g. `ForwardTuner`, `LateralVelocityTuner`, `PredictiveBrakingTuner`, `SwerveOffsetsTest`). These OpModes are run directly on the Driver Station to empirically derive values (ticks-to-inches multipliers, PIDF constants, zero-power decelerations, swerve encoder min/max, etc.) that a team then copies into `Constants.java`.
-  - A shared static `follower` field is built once via `Constants.createFollower(hardwareMap)` and reused across tuner selections.
-  - `Drawing` (bottom of the file) wraps the Panels/`FieldManager` dashboard drawing API (`bylazar` Panels) for visualizing robot pose/path/history during tuning.
-  - When adding a new tuner: add a nested `OpMode` class in `Tuning.java` and register it in the appropriate `s.folder(...)` block in the `Tuning` constructor — that's the whole integration point.
+- **`Tuning.java`** — a small file of `@Tuner`-annotated static factory methods (`mecanumTuner()`,
+  `pinpointTuner()`, `foresightTuner()`, `tests()`), each returning a `Procedure` from the
+  `pedro/procedures/` folder. Unlike the old (2.x) manual-tuner-OpModes-plus-Panels-dashboard workflow,
+  tuning now happens through **AutoTune**, a robot-hosted web page served at
+  `http://192.168.43.1:10158` while connected to the Robot Controller: build/deploy with a tuner
+  registered in `Tuning.java`, open that address, walk through the guided procedure, then copy the
+  generated Java config it outputs back into `Constants.java`.
+  - **`procedures/`** — library-provided `Procedure`/`TuningOpMode` implementations (`MecanumTuner`,
+    `PinpointTuner`, `ForesightTuner`, `Tests`, plus other localizer tuners not currently used by this
+    robot) copied from the official `Pedro-Pathing/Quickstart` repo — treat these as vendored, not
+    team logic to hand-edit.
+  - When adding a new tuner: add a nested `@Tuner public static Procedure ...()` method in
+    `Tuning.java` returning the relevant `Procedure` — that's the whole integration point.
 
 ### Dependencies (`build.dependencies.gradle`)
 
