@@ -1,127 +1,100 @@
 package org.firstinspires.ftc.teamcode.Autos; // make sure this aligns with class location
 
+import com.pedropathing.api.PoseFactory;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.ivy.Command;
-import com.pedropathing.ivy.Scheduler;
-import com.pedropathing.paths.PathChain;
+import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import static com.pedropathing.ivy.Scheduler.*;
-import static com.pedropathing.ivy.pedro.PedroCommands.*;
-import static com.pedropathing.ivy.groups.Groups.*;
+import static com.pedropathing.api.Paths.*;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.teamcode.pedro.Constants;
 
+// NOTE: com.pedropathing:ivy:1.0.0 (used here pre-3.0 for Command/Scheduler-based sequencing)
+// does not compile against Pedro 3.0.0 yet -- it's still built against the old
+// com.pedropathing.paths.PathChain type, which no longer exists. Until Pedro-Pathing ships a
+// 3.0-compatible Ivy release, this routine is sequenced manually with follower.follow(path) /
+// follower.isBusy() instead of Ivy's Command/Scheduler. Re-introduce Ivy here once available.
 @Autonomous(name = "BlueCLoseAuto", group = "Autonomous")
 public class BlueCloseGoal extends LinearOpMode {
 
     private Follower follower;
-    private final Pose startPose = new Pose(33, 133, Math.toRadians(90)); // Start Pose of our robot. This is against the goal facing AWAY
-    private final Pose scorePose = new Pose(58, 84, Math.toRadians(180)); // Scoring Pose of our robot.
-    private final Pose pickup1Pose = new Pose(12, 84, Math.toRadians(180)); // Highest (First Set) of Artifacts from the Spike Mark.
-    private final Pose pickup2Pose = new Pose(12, 60, Math.toRadians(180)); // Middle (Second Set) of Artifacts from the Spike Mark.
-    private final Pose pickup3Pose = new Pose(12, 36, Math.toRadians(180)); // Lowest (Third Set) of Artifacts from the Spike Mark.
-    private final Pose endPose = new Pose(38, 72); // Final Pose of our robot, off the starting line
+    private final PoseFactory p = PoseFactory.degrees();
+    private final Pose startPose = p.of(33, 133, 90); // Start Pose of our robot. This is against the goal facing AWAY
+    private final Pose scorePose = p.of(58, 84, 180); // Scoring Pose of our robot.
+    private final Pose pickup1Pose = p.of(12, 84, 180); // Highest (First Set) of Artifacts from the Spike Mark.
+    private final Pose pickup2Pose = p.of(12, 60, 180); // Middle (Second Set) of Artifacts from the Spike Mark.
+    private final Pose pickup3Pose = p.of(12, 36, 180); // Lowest (Third Set) of Artifacts from the Spike Mark.
+    private final Pose endPose = p.of(38, 72, 0); // Final Pose of our robot, off the starting line
 
-    //defining our PathChains
-    private PathChain scorePreload, grabPickup1, scorePickup1, grabPickup2, scorePickup2, grabPickup3, scorePickup3, leave;
+    //defining our Paths
+    private Path scorePreload, grabPickup1, scorePickup1, grabPickup2, scorePickup2, grabPickup3, scorePickup3, leave;
+    private Path[] routine;
+    private int step = 0;
 
     public void buildPaths() {
-        scorePreload = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, scorePose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
-                .build();
+        scorePreload = line(startPose, scorePose).linear(startPose, scorePose);
 
+        /* This is our grabPickup1 Path. We are using a single path with a line, which is a straight line. */
+        grabPickup1 = line(scorePose, pickup1Pose).linear(scorePose, pickup1Pose);
 
-        /* This is our grabPickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        grabPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup1Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-                .build();
+        /* This is our scorePickup1 Path. We are using a single path with a line, which is a straight line. */
+        scorePickup1 = line(pickup1Pose, scorePose).linear(pickup1Pose, scorePose);
 
-        /* This is our scorePickup1 PathChain. We are using a single path with a BezierLine, which is a straight line. */
-        scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1Pose, scorePose))
-                .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
-                .build();
+        /* This is our grabPickup2 Path. We are using a single path with a curve (curved line). */
+        grabPickup2 = curve(scorePose, p.of(60, 54, 0), pickup2Pose).linear(scorePose, pickup2Pose);
 
-        /* This is our grabPickup2 PathChain. We are using a single path with a BezierCurve (curved line). */
-        grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierCurve(scorePose, new Pose(60, 54), pickup2Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2Pose.getHeading())
-                .build();
+        /* This is our scorePickup2 Path. We are using a single path with a curve (curved line). */
+        scorePickup2 = curve(pickup2Pose, p.of(60, 54, 0), scorePose).linear(pickup2Pose, scorePose);
 
-        /* This is our scorePickup2 PathChain. We are using a single path with a BezierCurve (curved line). */
-        scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierCurve(pickup2Pose, new Pose(60, 54), scorePose))
-                .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading())
-                .build();
+        /* This is our grabPickup3 Path. We are using a single path with a curve (curved line). */
+        grabPickup3 = curve(scorePose, p.of(60, 21, 0), pickup3Pose).linear(scorePose, pickup3Pose);
 
-        /* This is our grabPickup3 PathChain. We are using a single path with a BezierCurve (curved line). */
-        grabPickup3 = follower.pathBuilder()
-                .addPath(new BezierCurve(scorePose, new Pose(60, 21), pickup3Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3Pose.getHeading())
-                .build();
+        /* This is our scorePickup3 Path. We are using a single path with a curve (curved line). */
+        scorePickup3 = curve(pickup3Pose, p.of(60, 30, 0), scorePose).linear(pickup3Pose, scorePose);
 
-        /* This is our scorePickup3 PathChain. We are using a single path with a BezierCurve (curved line). */
-        scorePickup3 = follower.pathBuilder()
-                .addPath(new BezierCurve(pickup3Pose, new Pose(60, 30), scorePose))
-                .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
-                .build();
-
-        /* This is our leave PathChain. We are using a single path using a BezierLine (straight line).
+        /* This is our leave Path. We are using a single path using a line (straight line).
          * We use Constant Interpolation here instead of Linear*/
-        leave = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, endPose))
-                .setConstantHeadingInterpolation(scorePose.getHeading())
-                .build();
-    }
+        leave = line(scorePose, endPose).constant(scorePose);
 
-    public Command autoRoutine() {
-        return sequential(
-                // score preload
-                follow(follower, scorePreload),
-                // first 3 balls intake
-                follow(follower, grabPickup1, true),
-                // fire first 3 balls
-                follow(follower, scorePickup1, true),
-                // 2nd 3 balls intake
-                follow(follower, grabPickup2, true),
-                // fire 2nd 3 balls
-                follow(follower, scorePickup2, true),
-                // 3rd 3 balls intake
-                follow(follower, grabPickup3, true),
-                // fire 3rd 3 balls
-                follow(follower, scorePickup3, true),
-                // leave score zone
-                follow(follower, leave, true)
-        );
+        routine = new Path[] {
+                scorePreload,   // score preload
+                grabPickup1,    // first 3 balls intake
+                scorePickup1,   // fire first 3 balls
+                grabPickup2,    // 2nd 3 balls intake
+                scorePickup2,   // fire 2nd 3 balls
+                grabPickup3,    // 3rd 3 balls intake
+                scorePickup3,   // fire 3rd 3 balls
+                leave           // leave score zone
+        };
     }
 
     @Override
     public void runOpMode() {
         //These will run when the OpMode is initiated
-        Scheduler.reset();
-        follower = Constants.createFollower(hardwareMap);
+        follower = Constants.create(hardwareMap);
         buildPaths();
-        follower.setStartingPose(startPose);
+        follower.setPose(startPose);
 
         waitForStart();
-        //We schedule all our commands when we start the OpMode
-        schedule(autoRoutine());
+        //Start the first path in the routine
+        step = 0;
+        follower.follow(routine[step]);
         while (opModeIsActive()) {
-            //Update the follower and execute the scheduler every loop
+            //Update the follower and advance to the next path once the current one finishes
             follower.update();
-            Scheduler.execute();
+
+            if (!follower.isBusy() && step < routine.length - 1) {
+                step++;
+                follower.follow(routine[step]);
+            }
 
             // Feedback to Driver Hub for debugging
-            telemetry.addData("x", follower.getPose().getX());
-            telemetry.addData("y", follower.getPose().getY());
-            telemetry.addData("heading", follower.getPose().getHeading());
+            telemetry.addData("step", step);
+            telemetry.addData("x", follower.pose().x());
+            telemetry.addData("y", follower.pose().y());
+            telemetry.addData("heading", follower.pose().heading());
             telemetry.update();
         }
     }

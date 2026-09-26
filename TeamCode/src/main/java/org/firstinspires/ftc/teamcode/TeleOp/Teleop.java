@@ -92,10 +92,6 @@ public class Teleop extends LinearOpMode {
         double currentTurretPower = 0; // still needs to persist outside the loop
         double stopRampRate = 0.35;    // how slowly it decays to 0 on release — tune this
 
-
-
-
-
         gate.setPosition(gateclose);
 
 
@@ -237,6 +233,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addLine("Left and Right Bumper to manually move turret");
             telemetry.addData("Current Position: ", getCurrentDeg());
             telemetry.addData("Shooter power: ", shootervel);
+            telemetry.addData("Actual shooter Velocity: ", leftshooter.getVelocity());
             telemetry.update();
         }
     }
