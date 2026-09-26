@@ -11,16 +11,16 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "SimpleTurret", group = "Testing")
+@TeleOp(name = "Offset", group = "Testing")
 
-public class SimpleTurretTracking extends LinearOpMode {
+public class CheckOffset extends LinearOpMode {
 
     private DcMotorEx turretmtr; // the motor that turns the turntable/turret
     private Limelight3A limelight;
     final double ticks_degree = (8192.0 * 8.0) / 360;
     final double min_degree = -90;
     final double max_degree = 90;
-    final int AprilTagPipeline = 1;
+    final int AprilTagPipeline = 0;
 
     public double getCurrentDeg() {
         return turretmtr.getCurrentPosition() / ticks_degree;
@@ -48,7 +48,7 @@ public class SimpleTurretTracking extends LinearOpMode {
         }
 
 
-        double turretpower = 0.5;
+        double turretpower = 0;
         double slowdown_zone = 20;
 
         waitForStart();

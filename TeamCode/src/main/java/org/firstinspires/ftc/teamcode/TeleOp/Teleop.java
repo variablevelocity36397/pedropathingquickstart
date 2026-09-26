@@ -233,6 +233,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addLine("Left and Right Bumper to manually move turret");
             telemetry.addData("Current Position: ", getCurrentDeg());
             telemetry.addData("Shooter power: ", shootervel);
+            telemetry.addData("Actual shooter Velocity: ", leftshooter.getVelocity());
             telemetry.update();
         }
     }
