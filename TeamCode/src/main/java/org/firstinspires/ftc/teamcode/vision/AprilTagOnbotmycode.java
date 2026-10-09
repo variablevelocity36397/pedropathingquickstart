@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.vision;
 
 import android.util.Size;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -42,17 +42,17 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@TeleOp(name = "Optimized goBilda AprilTag", group = "Concept")
-public class AprilTagOnbot extends LinearOpMode {
+@TeleOp(name = "Optimized goBildafgg AprilTag", group = "Concept")
+public class AprilTagOnbotmycode extends LinearOpMode {
 
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
 
     @Override
     public void runOpMode() {
-        initAprilTag();
+        //initAprilTag();
 
-        // Example of forcing the tag size to 5 inches (converted to meters for the SDK)
+        // Example of forcing the tag size to 5 inches
         double tagSizeMeters = 4.0 * 0.0254;
 
         telemetry.addData(">", "Touch START to start OpMode");
@@ -93,7 +93,7 @@ public class AprilTagOnbot extends LinearOpMode {
         // Define your current settings
     }
 
-    private void initAprilTag() {
+    public void initAprilTag() {
         aprilTag = new AprilTagProcessor.Builder()
                 // Updated scaled intrinsics for 640x480 resolution
                 .setLensIntrinsics(545.584,545.584,350.588,223.150)
@@ -111,6 +111,10 @@ public class AprilTagOnbot extends LinearOpMode {
         builder.addProcessor(aprilTag);
 
         visionPortal = builder.build();
+    }
+
+    List<AprilTagDetection> getDetections() {
+        return aprilTag.getDetections();
     }
 
     private void telemetryAprilTag() {

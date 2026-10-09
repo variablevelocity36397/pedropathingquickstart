@@ -19,7 +19,7 @@ public class AprilTagOnbot {
     // --- MEASURE YOUR PRINTED TAGS ---
     // Enter the exact width of the black square of your printed tags in inches.
     // The SDK needs this exact number to calculate distance and bearing angles.
-    private final double TAG_SIZE_INCHES = 4.0;
+    private final double TAG_SIZE_INCHES = 5.1;
 
     public void initAprilTag(HardwareMap hardwareMap) {
 

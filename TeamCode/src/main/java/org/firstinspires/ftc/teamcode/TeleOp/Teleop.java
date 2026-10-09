@@ -23,6 +23,7 @@ public class Teleop extends LinearOpMode {
     private CRServo intakeservo; // the middle intake powered via servo
     private Servo servokicker; // the servo kicker
     private Servo gate;
+    private Servo hood;
 
     final double ticks_degree = (8192.0 * 8.0) / 360;
     final double min_degree = -210;
@@ -49,7 +50,7 @@ public class Teleop extends LinearOpMode {
         turretmtr = hardwareMap.get(DcMotorEx.class, "turretmtr");
         servokicker = hardwareMap.get(Servo.class, "servokicker");
         gate = hardwareMap.get(Servo.class, "gate");
-        //hood = hardwareMap.get(Servo.class, "hood");
+        hood = hardwareMap.get(Servo.class, "hood");
         leftshooter.setDirection(DcMotorSimple.Direction.FORWARD);
         rightshooter.setDirection(DcMotorSimple.Direction.REVERSE);
         intakeservo.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -86,12 +87,16 @@ public class Teleop extends LinearOpMode {
         final double servokickerrest = 0.456;
         final double gateopen = 0.5;
         final double gateclose = 0.25;
-        double shootervel = 750;
+        double shootervel = 1650;
         ElapsedTime kickTimer = new ElapsedTime();
         double slowdown_zone = 12;
         double currentTurretPower = 0; // still needs to persist outside the loop
         double stopRampRate = 0.35;    // how slowly it decays to 0 on release — tune this
+        double hoodPos = 0.5;
 
+        gate.setPosition(gateclose);
+        hood.setPosition(hoodPos);
+        servokicker.setPosition(servokickerrest);
         gate.setPosition(gateclose);
 
 
@@ -150,9 +155,9 @@ public class Teleop extends LinearOpMode {
 
             if (gamepad1.yWasPressed()) { // click y to toggle shooter power level
                 if (flag4) {
-                    shootervel = 1200;
+                    shootervel = 1850;
                 } else {
-                    shootervel = 750;
+                    shootervel = 1575;
                 }
                 flag4 = !flag4;
                 if (flag3) { // if shooter is running and power is changed, power is immediately updated
@@ -190,6 +195,18 @@ public class Teleop extends LinearOpMode {
             }
             if (gamepad1.right_bumper) {
                 targetPower = -0.4;
+            }
+            if (gamepad1.dpadLeftWasPressed()) {
+                if (hoodPos >= 0.1) {
+                    hoodPos = hoodPos - 0.1;
+                    hood.setPosition(hoodPos);
+                }
+            }
+            if (gamepad1.dpadRightWasPressed()) {
+                if (hoodPos <= 0.9) {
+                    hoodPos = hoodPos +0.1;
+                    hood.setPosition(hoodPos);
+                }
             }
 
             double distToMax = max_degree - currentDeg;
@@ -231,6 +248,7 @@ public class Teleop extends LinearOpMode {
             telemetry.addLine("Left joystick to move, Right joystick to turn");
             telemetry.addLine("Hold the Right Trigger to drive at 20% speed");
             telemetry.addLine("Left and Right Bumper to manually move turret");
+            telemetry.addLine("Dpad Left and Right to move hood");
             telemetry.addData("Current Position: ", getCurrentDeg());
             telemetry.addData("Shooter power: ", shootervel);
             telemetry.addData("Actual shooter Velocity: ", leftshooter.getVelocity());
