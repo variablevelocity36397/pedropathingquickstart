@@ -8,9 +8,9 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "TeleOp", group = "TeleOp")
+@TeleOp(name = "TeleOpTest", group = "TeleOp")
 
-public class Teleop extends LinearOpMode {
+public class TeleopTest extends LinearOpMode {
 
     private DcMotor intakemotor;   // intake motor
     private DcMotor frwheel; // front right wheel
@@ -62,6 +62,8 @@ public class Teleop extends LinearOpMode {
 
         rightshooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); // Dont touch
         leftshooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); // Dont touch
+        rightshooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftshooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         telemetry.addLine("--------  GAMEPAD CONTROLS --------");
         telemetry.addLine("Press A to toggle intake");
@@ -87,7 +89,7 @@ public class Teleop extends LinearOpMode {
         final double servokickerrest = 0.456;
         final double gateopen = 0.5;
         final double gateclose = 0.25;
-        double shootervel = 1650;
+        double shootervel = 2520;
         ElapsedTime kickTimer = new ElapsedTime();
         double slowdown_zone = 12;
         double currentTurretPower = 0; // still needs to persist outside the loop
@@ -155,9 +157,9 @@ public class Teleop extends LinearOpMode {
 
             if (gamepad1.yWasPressed()) { // click y to toggle shooter power level
                 if (flag4) {
-                    shootervel = 1850;
+                    shootervel = 1960;
                 } else {
-                    shootervel = 1575;
+                    shootervel = 2520;
                 }
                 flag4 = !flag4;
                 if (flag3) { // if shooter is running and power is changed, power is immediately updated
@@ -168,7 +170,6 @@ public class Teleop extends LinearOpMode {
             if (gamepad1.xWasPressed()) { // click the button x to toggle the shooter
                 if (!flag3) {
                     leftshooter.setVelocity(shootervel);
-                    rightshooter.setVelocity(shootervel);
                 }
                 else {
                     rightshooter.setPower(0);

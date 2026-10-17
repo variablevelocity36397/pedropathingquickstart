@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.vision;
+/*package org.firstinspires.ftc.teamcode.vision;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -15,6 +15,8 @@ public class AutoAlign extends OpMode {
 
     private final AprilTagOnbot aprilTagOnbot = new AprilTagOnbot();
     private final MecanumDrive drive = new MecanumDrive();
+
+    private final AprilTagOnbot2 aprilTagOnbot2 = new AprilTagOnbot2();
 
     //----------------------PD Variables--------------------------//
 
@@ -146,5 +148,8 @@ public class AutoAlign extends OpMode {
         telemetry.addData("Tuning D", "%.4f (D-PAD U/D) kD");
         telemetry.addData("Step Size", "%.4f(B Button)", stepSizes[stepIndex]);
 
+        telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y));
+
     }
 }
+*/
