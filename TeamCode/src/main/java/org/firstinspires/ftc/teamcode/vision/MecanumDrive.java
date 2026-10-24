@@ -19,11 +19,8 @@ public class MecanumDrive {
         frontRightMotor = hwMap.get(DcMotor.class, "front_right_motor");
         backRightMotor = hwMap.get(DcMotor.class, "back_right_motor");
 
-        // Set motor directions (Left side reversed for forward driving)
-        frontLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        frontRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        // Set motor directions (Back left side reversed for normal driving)
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

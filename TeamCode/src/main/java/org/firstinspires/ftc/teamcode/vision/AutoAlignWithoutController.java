@@ -1,4 +1,4 @@
-/*package org.firstinspires.ftc.teamcode.vision;
+package org.firstinspires.ftc.teamcode.vision;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -161,4 +161,3 @@ public class AutoAlignWithoutController extends OpMode {
         telemetry.addData("Tuning D", kD);
     }
 }
-*/
