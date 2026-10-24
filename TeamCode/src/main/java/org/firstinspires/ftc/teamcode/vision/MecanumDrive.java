@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.vision;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
@@ -18,9 +19,8 @@ public class MecanumDrive {
         frontRightMotor = hwMap.get(DcMotor.class, "front_right_motor");
         backRightMotor = hwMap.get(DcMotor.class, "back_right_motor");
 
-        // Set motor directions (Left side reversed for forward driving)
-        frontLeftMotor.setDirection(DcMotor.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotor.Direction.REVERSE);
+        // Set motor directions (Back left side reversed for normal driving)
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

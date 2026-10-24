@@ -4,26 +4,22 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-
-import org.firstinspires.ftc. vision.apriltag.AprilTagDetection;
-
 import java.util.List;
-
 
 @TeleOp
 public class AutoAlign extends OpMode {
 
-    private final AprilTagOnbot aprilTagOnbot = new AprilTagOnbot();
+    private final AprilTagDetection aprilTagDetection = new AprilTagDetection();
     private final MecanumDrive drive = new MecanumDrive();
 
     //----------------------PD Variables--------------------------//
 
-    double kP = 0.011;
+    double kP = 0.015;
     double error = 0;
     double lastError = 0;
     double goalX = 0; // offset here//
     double angleTolerance = 1;
-    double kD = 0.0016;
+    double kD = 0.0;
     double curTime = 0;
     double lastTime = 0;
 
@@ -35,6 +31,7 @@ public class AutoAlign extends OpMode {
 
     double[] stepSizes = {1.0, 0.1, 0.001, 0.0001};
     int stepIndex = 2;
+    boolean lastB, lastU, lastD, lastL, lastR; // Compact state trackers
 
     public List<Integer> red = List.of(
             30, 31, 32, 33, 34, 35, 36, 37
@@ -53,11 +50,9 @@ public class AutoAlign extends OpMode {
 
     @Override
     public void init() {
-        aprilTagOnbot.initAprilTag(hardwareMap); // Passes hardwareMap explicitly
+        aprilTagDetection.initAprilTag(hardwareMap); // Passes hardwareMap explicitly
         drive.init(hardwareMap);
         telemetry.addLine("Initialized and starting runOpMode");
-
-        // DELETE THIS LINE: aprilTagOnbot.runOpMode();
     }
 
     public void start() {
@@ -67,9 +62,20 @@ public class AutoAlign extends OpMode {
         timer.reset();
     }
 
-
     @Override
     public void loop() {
+        // --- COMPACT LIVE TUNING CONTROLS ---
+        if (gamepad1.b && !lastB) stepIndex = (stepIndex + 1) % 4;
+        lastB = gamepad1.b;
+
+        if (gamepad1.dpad_right && !lastR) kP += stepSizes[stepIndex];
+        if (gamepad1.dpad_left && !lastL) kP = Math.max(0, kP - stepSizes[stepIndex]);
+        lastR = gamepad1.dpad_right; lastL = gamepad1.dpad_left;
+
+        if (gamepad1.dpad_up && !lastU) kD += stepSizes[stepIndex];
+        if (gamepad1.dpad_down && !lastD) kD = Math.max(0, kD - stepSizes[stepIndex]);
+        lastU = gamepad1.dpad_up; lastD = gamepad1.dpad_down;
+
         //=---------Get Mecanum Drive inputs=----------//
         forward = 0.0;
         strafe = 0.0;
@@ -77,24 +83,41 @@ public class AutoAlign extends OpMode {
 
         //---------- Get apriltag info------------//
 
-        List<AprilTagDetection> detections = aprilTagOnbot.getDetections();
-
-
+        List<org.firstinspires.ftc.vision.apriltag.AprilTagDetection> detections = aprilTagDetection.getDetections();
 
         if (timer.seconds() > 1.0) {
 
             if (detections != null && !detections.isEmpty()) {
                 List<Integer> myTeamIds = this.getMyTeamIds();
-                for (AprilTagDetection detection : detections) {
+                for (org.firstinspires.ftc.vision.apriltag.AprilTagDetection detection : detections) {
                     if (!myTeamIds.contains((Integer) detection.id)) {
                         telemetry.addData("skipping April tag", detection.id);
                         continue;
                     }
-
                     // ADD THIS SAFETY CHECK: Skip if the 3D position hasn't calculated yet
                     if (detection.ftcPose == null) {
                         continue;
                     }
+
+                    double roll = detection.ftcPose.roll;
+                    boolean isCellUp = Math.abs(roll) < 90.0;
+
+                    telemetry.addData("Detected Tag ID", detection.id);
+                    telemetry.addData("Roll Angle", "%.1f deg", roll);
+                    telemetry.addData("CELL State", isCellUp);
+
+                    if (!isCellUp) {
+                        continue;
+                    }
+
+                    //added camera fps
+                    telemetry.addData("Camera FPS", aprilTagDetection.getCameraFps());
+
+                    // adding for offset
+                    telemetry.addData("X offset (Left/Right)", detection.ftcPose.x);
+                    telemetry.addData("Y offset (Forward/Back)", detection.ftcPose.y);
+                    telemetry.addData("Z Offset (Up/Down)", detection.ftcPose.z);
+                    //end of offset
 
                     telemetry.addData("detected April tag", detection.id);
                     error = goalX - detection.ftcPose.bearing;
@@ -114,6 +137,7 @@ public class AutoAlign extends OpMode {
                         lastTime = curTime;
                     }
                     telemetry.addData("parameters updated to ", rotate);
+                    break;
 
                 }
             } else {
@@ -142,9 +166,10 @@ public class AutoAlign extends OpMode {
             telemetry.addLine("MANUAL Rotate Mode");
         }
         telemetry.addLine("--------------------");
-        telemetry.addData("Tuning P", "%.4f (D-PAD L/R) kP");
-        telemetry.addData("Tuning D", "%.4f (D-PAD U/D) kD");
-        telemetry.addData("Step Size", "%.4f(B Button)", stepSizes[stepIndex]);
+        // Added the variables so they actually display
+        telemetry.addData("Tuning P", "%.4f (D-PAD L/R) kP", kP);
+        telemetry.addData("Tuning D", "%.4f (D-PAD U/D) kD", kD);
+        telemetry.addData("Step Size", "%.4f (B Button)", stepSizes[stepIndex]);
 
     }
 }
