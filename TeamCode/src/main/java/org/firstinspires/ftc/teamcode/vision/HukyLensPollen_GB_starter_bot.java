@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.vision;
 
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -44,6 +45,7 @@ import com.skeletonarmy.marrow.prompts.ValuePrompt;
     - Point at a pollen ball and press the learn button so it becomes ID 1
 */
 
+@Disabled  // hidden: uses left_drive/right_drive names this mecanum robot does not have. Use "Pollen Collector (P)".
 @Autonomous(name = "Pollen Collector (StarterBot)", group = "HuskyLens")
 public class HukyLensPollen_GB_starter_bot extends LinearOpMode {
 
