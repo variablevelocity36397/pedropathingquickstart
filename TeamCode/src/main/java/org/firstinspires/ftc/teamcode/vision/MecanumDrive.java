@@ -20,6 +20,8 @@ public class MecanumDrive {
         backRightMotor = hwMap.get(DcMotor.class, "back_right_motor");
 
         // Set motor directions (Back left side reversed for normal driving)
+        // (both left motors are reversed, matching the TeleOp / CheckDrivetrainDirection setup)
+        frontLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         frontLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
